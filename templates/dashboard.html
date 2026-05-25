@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard de Análisis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f6fb;
+              font-family: "Segoe UI", sans-serif;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0a369d, #081f5c);
+            color: white;
+            border-radius: 22px;
+              padding: 26px 32px;
+             margin-bottom: 24px;
+        }
+
+        .metric-card {
+             min-height: 135px;
+            border: none;
+            border-radius: 22px;
+            box-shadow: 0 12px 28px rgba(10, 54, 157, .10);
+            padding: 24px;
+            background: white;
+        }
+
+        .metric-number {
+            font-size: 34px;
+            font-weight: 800;
+            color: #0a369d;
+        }
+
+        .section-card {
+            border: none;
+            border-radius: 22px;
+            box-shadow: 0 12px 28px rgba(0,0,0,.06);
+            background: white;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .risk-alto {
+            background: #dc3545;
+        }
+
+        .risk-medio {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .risk-bajo {
+            background: #198754;
+        }
+
+        .badge-risk {
+            border-radius: 30px;
+            padding: 8px 14px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-main {
+            background: #0a369d;
+            color: white;
+            border-radius: 14px;
+            padding: 10px 18px;
+        }
+
+        .btn-main:hover {
+            background: #082c7c;
+            color: white;
+        }
+
+        .list-top li {
+            border: none;
+            border-bottom: 1px solid #eee;
+            padding: 12px 0;
+        }
+        .table {
+    font-size: 14px;
+}
+
+.table thead th {
+    background: #f1f4fb;
+    color: #334;
+    border-bottom: none;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+.table-responsive {
+    max-height: 560px;
+    overflow: auto;
+}
+
+.metric-number {
+    font-size: 38px;
+    font-weight: 800;
+    color: #0a369d;
+}
+
+.small-label {
+    font-size: 13px;
+    color: #6c7480;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-risk {
+    border-radius: 30px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: white;
+    font-weight: 700;
+}
+
+.risk-alto { background: #dc3545; }
+.risk-medio { background: #ffc107; color: #222; }
+.risk-bajo { background: #198754; }
+
+.btn-main {
+    background: #0a369d;
+    color: white;
+    border-radius: 12px;
+    padding: 8px 14px;
+}
+
+.btn-main:hover {
+    background: #082c7c;
+    color: white;
+}
+    </style>
+</head>
+
+<body>
+<!-- <div class="container py-4"> -->
+    <div class="container-fluid px-4 py-4">
+
+    <div class="hero">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-1">Monitor Estratégico de Medios</h2>
+                <p class="mb-0">Análisis automático de focos rojos en PDF periodístico</p>
+            </div>
+
+            <form action="/guardar" method="POST">
+                <button class="btn btn-light">Guardar datos</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h5>Documento analizado</h5>
+        <strong>{{ nombre_archivo }}</strong>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div>Páginas procesadas</div>
+                <div class="metric-number">{{ total_paginas }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div>Alertas detectadas</div>
+                <div class="metric-number">{{ total_alertas }}</div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div>Riesgo general</div>
+                <span class="badge-risk risk-{{ riesgo_general|lower }}">{{ riesgo_general }}</span>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div>Personas detectadas</div>
+                <div class="metric-number">{{ conteo_personas|length }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="section-card">
+                <h5>Top palabras sensibles</h5>
+                <ul class="list-group list-top">
+                    {% for palabra, cantidad in conteo_palabras %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ palabra }}</span>
+                        <span class="badge bg-dark">{{ cantidad }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="section-card">
+                <h5>Personas más mencionadas</h5>
+                <ul class="list-group list-top">
+                    {% for persona, cantidad in conteo_personas %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ persona }}</span>
+                        <span class="badge bg-primary">{{ cantidad }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="section-card">
+                <h5>Secretarías / instituciones</h5>
+                <ul class="list-group list-top">
+                    {% for secretaria, cantidad in conteo_secretarias %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{{ secretaria }}</span>
+                        <span class="badge bg-secondary">{{ cantidad }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h5>Focos rojos detectados</h5>
+        <div class="table-responsive"></div>
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Página</th>
+                    <th>Palabra</th>
+                    <th>Cantidad</th>
+                    <th>Riesgo</th>
+                    <th>Contexto</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for alerta in alertas %}
+                <tr>
+                    <td>{{ alerta.pagina }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modal{{ loop.index }}">
+                            {{ alerta.palabra }}
+                        </button>
+                    </td>
+                    <td>{{ alerta.cantidad }}</td>
+                    <td>
+                        <span class="badge-risk risk-{{ alerta.riesgo }}">
+                            {{ alerta.riesgo }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-main"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modal{{ loop.index }}">
+                            Ver nota / párrafo
+                        </button>
+                    </td>
+                </tr>
+
+                <div class="modal fade" id="modal{{ loop.index }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content" style="border-radius: 20px;">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Contexto detectado</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <p><strong>Página:</strong> {{ alerta.pagina }}</p>
+                                <p><strong>Palabra detectada:</strong> {{ alerta.palabra }}</p>
+                                <p><strong>Riesgo:</strong> {{ alerta.riesgo }}</p>
+
+                                <hr>
+
+                                <p style="line-height: 1.8;">
+                                    {{ alerta.contexto }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h5>Menciones relacionadas con diputados</h5>
+
+        {% if menciones_diputados %}
+            <ul class="list-group">
+                {% for item in menciones_diputados %}
+                    <li class="list-group-item">
+                        <strong>Página {{ item.pagina }}:</strong> {{ item.texto }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No se detectaron menciones directas a diputados o diputadas.</p>
+        {% endif %}
+    </div>
+
+    <a href="/" class="btn btn-secondary">Analizar otro PDF</a>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
